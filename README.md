@@ -1,5 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js 활용한 실시간 설비 모니터링 대시보드 - 전파용
 
+Next.js와 Tailwind CSS를 활용하여 제조 현장의 설비를 실시간으로 모니터링하는 대시보드 프로젝트입니다.
+
+## Tech Stack
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Visualization**: Recharts
+- **State Management**: React Hooks (useState, useEffect)
+
+## 🏗 Branch Strategy (Git-flow)
+- `main`: 최종 배포 브랜치
+- `develop`: 통합 개발 및 테스트 브랜치
+- `feature/*`: 개별 기능 구현 브랜치 (예: `feature/ui-setup`, `feature/data-chart`)
 ## Getting Started
 
 First, run the development server:
