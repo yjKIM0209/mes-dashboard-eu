@@ -1,15 +1,16 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const menus = [
-    { name: '대시보드', href: '/', icon: '📊' },
-    { name: '설비 관리', href: '/equipment', icon: '⚙️' },
-    { name: '생산 리포트', href: '/reports', icon: '📈' },
+    { name: "대시보드", href: "/", icon: "📊" },
+    { name: "설비 관리", href: "/equipment", icon: "⚙️" },
+    { name: "이력 조회", href: "/equipment-history", icon: "📜" },
+    { name: "생산 리포트", href: "/reports", icon: "📈" },
   ];
 
   return (
@@ -17,19 +18,21 @@ export default function Sidebar() {
       <div className="p-6 text-2xl font-black border-b border-slate-800 tracking-tighter text-blue-400">
         🏭 FACTORY
       </div>
-      
+
       <nav className="flex-1 p-4 space-y-1">
         {menus.map((menu) => {
-          const isActive = pathname === menu.href || (menu.href !== '/' && pathname.startsWith(menu.href));
-          
+          const isActive =
+            pathname === menu.href ||
+            (menu.href !== "/" && pathname.startsWith(`${menu.href}/`));
+
           return (
-            <Link 
+            <Link
               key={menu.href}
-              href={menu.href} 
+              href={menu.href}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-                isActive 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                isActive
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-400 hover:bg-slate-800"
               }`}
             >
               <span className="text-xl">{menu.icon}</span>
