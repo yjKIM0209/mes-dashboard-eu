@@ -14,29 +14,66 @@ import { HistoryData } from "@/types";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+const EQP_NAME_MAP: Record<string, string> = {
+  "EQP-1001": "믹서기 #1",
+  "EQP-1002": "믹서기 #2",
+  "EQP-1003": "충진기 #1",
+  "EQP-1004": "비전검사기 #1",
+  "EQP-1005": "중량검사기 #1",
+};
+
 const generateInitialData = (): HistoryData[] => {
-  return Array.from({ length: 50 }).map((_, i) => ({
-    no: i + 1,
-    status: i % 5 === 0 ? "점검" : "정상",
-    process: ["믹싱", "충진", "포장", "검사"][i % 4],
-    factory: "창원공장",
-    area: "A-Line",
-    eqpId: `EQP-${1000 + i}`,
-    eqpName: `설비-${i + 1}`,
-    startTime: "2026-02-19 10:00",
-    endTime: "2026-02-19 11:00",
-    repairCost: Math.floor(Math.random() * 5000) + 500,
-    duration: "01:00",
-  }));
+  return Array.from({ length: 50 }).map((_, i) => {
+    const eqpId = `EQP-${1001 + i}`;
+    return {
+      no: i + 1,
+      status: i % 5 === 0 ? "점검" : "정상",
+      process: ["믹싱", "충진", "포장", "검사"][i % 4],
+      factory: "창원공장",
+      area: "A-Line",
+      eqpId: eqpId,
+      eqpName: EQP_NAME_MAP[eqpId] || `미등록 설비(${eqpId})`,
+      startTime: "2026-02-19 10:00",
+      endTime: "2026-02-19 11:00",
+      repairCost: Math.floor(Math.random() * 5000) + 500,
+      duration: "01:00",
+      memo: "",
+    };
+  });
 };
 
 const staticRowData = generateInitialData();
+interface HistoryGridProps {
+  filterEqpIds: string[];
+  dateRange: { start: string; end: string };
+  searchText: string;
+}
 
-export default function HistoryGrid() {
-    const myTheme = themeQuartz.withParams({
+export default function HistoryGrid({
+  filterEqpIds,
+  dateRange,
+  searchText,
+}: HistoryGridProps) {
+  const myTheme = themeQuartz.withParams({
     accentColor: "#2563eb",
     headerBackgroundColor: "#f8fafc",
   });
+
+  const filteredData = useMemo(() => {
+    let data = staticRowData;
+
+    if (filterEqpIds.length > 0) {
+      data = data.filter((item) => filterEqpIds.includes(item.eqpId));
+    }
+
+    const start = new Date(dateRange.start).getTime();
+    const end = new Date(dateRange.end).getTime();
+
+    return data.filter((item) => {
+      const itemTime = new Date(item.startTime).getTime();
+      return itemTime >= start && itemTime <= end;
+    });
+  }, [filterEqpIds, dateRange]);
 
   const columnDefs = useMemo<ColDef<HistoryData>[]>(
     () => [
@@ -69,6 +106,17 @@ export default function HistoryGrid() {
         },
       },
       {
+        field: "eqpId",
+        headerName: "설비 ID",
+        width: 110,
+        cellClass: "font-semibold text-slate-600",
+      },
+      {
+        field: "eqpName",
+        headerName: "설비명",
+        width: 130,
+      },
+      {
         field: "process",
         headerName: "공정",
         width: 120,
@@ -86,6 +134,14 @@ export default function HistoryGrid() {
         },
         cellClass: "text-right text-blue-700 font-mono",
       },
+      {
+        field: "memo",
+        headerName: "비고",
+        minWidth: 180,
+        flex: 1,
+        editable: true,
+        cellEditor: "agTextCellEditor",
+      },
       { field: "startTime", headerName: "시작 시간", flex: 1, minWidth: 150 },
       { field: "endTime", headerName: "종료 시간", flex: 1, minWidth: 150 },
     ],
@@ -93,11 +149,12 @@ export default function HistoryGrid() {
   );
 
   return (
-    <div className="w-full h-full shadow-lg border border-slate-200 rounded-lg overflow-hidden">
+    <div className="w-full h-full">
       <AgGridReact<HistoryData>
         theme={myTheme}
-        rowData={staticRowData}
+        rowData={filteredData}
         columnDefs={columnDefs}
+        quickFilterText={searchText}
         defaultColDef={{
           sortable: true,
           filter: true,

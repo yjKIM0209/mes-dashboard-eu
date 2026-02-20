@@ -1,6 +1,7 @@
 export interface EquipmentNode {
   id: string;
   name: string;
+  type: 'factory' | 'area' | 'equipment'
   children?: EquipmentNode[];
 }
 
@@ -17,4 +18,5 @@ export interface HistoryData {
   endTime: string;
   repairCost: number; 
   duration: string;
+  memo: string;
 }
