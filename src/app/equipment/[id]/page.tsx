@@ -2,6 +2,8 @@ import { mockEquipments } from "@/lib/mockData";
 import Link from "next/link";
 import LiveTemperature from "@/components/LiveTemperature";
 import TemperatureChart from "@/components/TemperatureChart";
+import LightningTemperatureChart from "@/components/LightningTemperatureChart";
+import ChartJSTemperatureChart from "@/components/ChartJSTemperatureChart";
 
 export default async function EquipmentDetailPage({
   params,
@@ -25,6 +27,21 @@ export default async function EquipmentDetailPage({
     );
   }
 
+  const idNumber = parseInt(id.split("-")[1], 10);
+  let ChartEngine;
+  let engineName;
+
+  if (idNumber >= 7) {
+    ChartEngine = <LightningTemperatureChart />;
+    engineName = "LightningChart (Ultra-Performance)";
+  } else if (idNumber >= 4) {
+    ChartEngine = <ChartJSTemperatureChart />;
+    engineName = "Chart.js (Real-time)";
+  } else {
+    ChartEngine = <TemperatureChart />;
+    engineName = "Recharts (Standard)";
+  }
+
   return (
     <div className="p-10 bg-slate-50 min-h-screen">
       <Link
@@ -45,7 +62,13 @@ export default async function EquipmentDetailPage({
         <LiveTemperature initialTemp={equipment.temperature} />
 
         <div className="mt-8">
-          <TemperatureChart />
+          <div className="mb-2 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            <p className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter">
+              Engine: {engineName}
+            </p>
+          </div>
+          {ChartEngine}
         </div>
 
         <div className="grid grid-cols-2 gap-8 border-t pt-6 mt-6">
