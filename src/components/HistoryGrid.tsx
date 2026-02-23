@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   ColDef,
@@ -42,7 +42,6 @@ const generateInitialData = (): HistoryData[] => {
   });
 };
 
-const staticRowData = generateInitialData();
 interface HistoryGridProps {
   filterEqpIds: string[];
   dateRange: { start: string; end: string };
@@ -54,26 +53,50 @@ export default function HistoryGrid({
   dateRange,
   searchText,
 }: HistoryGridProps) {
+  const [rowData, setRowData] = useState<HistoryData[]>(generateInitialData());
+
+  const addNewRow = useCallback(() => {
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+    const newRow: HistoryData = {
+      no: rowData.length + 1, 
+      status: "점검",
+      process: "미지정",
+      factory: "창원공장",
+      area: "A-Line",
+      eqpId: "NEW-EQP",
+      eqpName: "신규 등록 설비",
+      startTime: formattedDate,
+      endTime: "",
+      repairCost: 0,
+      duration: "00:00",
+      memo: "신규 추가됨",
+    };
+    setRowData((prev) => [newRow, ...prev]);
+  }, [rowData.length]);
+
   const myTheme = themeQuartz.withParams({
     accentColor: "#2563eb",
     headerBackgroundColor: "#f8fafc",
   });
 
   const filteredData = useMemo(() => {
-    let data = staticRowData;
-
-    if (filterEqpIds.length > 0) {
-      data = data.filter((item) => filterEqpIds.includes(item.eqpId));
-    }
-
-    const start = new Date(dateRange.start).getTime();
-    const end = new Date(dateRange.end).getTime();
+    const data = [...rowData];
 
     return data.filter((item) => {
-      const itemTime = new Date(item.startTime).getTime();
-      return itemTime >= start && itemTime <= end;
+      if (item.eqpId === "NEW-EQP") return true;
+
+      const matchesEqp = filterEqpIds.length === 0 || filterEqpIds.includes(item.eqpId);
+      
+      const start = new Date(dateRange.start).getTime();
+      const end = new Date(dateRange.end).getTime();
+      const itemTime = new Date(item.startTime.replace(/-/g, "/")).getTime();
+      const matchesDate = itemTime >= start && itemTime <= end;
+
+      return matchesEqp && matchesDate;
     });
-  }, [filterEqpIds, dateRange]);
+  }, [rowData, filterEqpIds, dateRange]);
 
   const columnDefs = useMemo<ColDef<HistoryData>[]>(
     () => [
@@ -109,12 +132,14 @@ export default function HistoryGrid({
         field: "eqpId",
         headerName: "설비 ID",
         width: 110,
+        editable: true,
         cellClass: "font-semibold text-slate-600",
       },
       {
         field: "eqpName",
         headerName: "설비명",
         width: 130,
+        editable: true,
       },
       {
         field: "process",
@@ -130,7 +155,7 @@ export default function HistoryGrid({
         width: 130,
         editable: true,
         valueFormatter: (params: ValueFormatterParams<HistoryData>) => {
-          return params.value ? `$ ${params.value.toLocaleString()}` : "$ 0";
+          return params.value ? `₩ ${params.value.toLocaleString()}` : "₩ 0";
         },
         cellClass: "text-right text-blue-700 font-mono",
       },
@@ -149,25 +174,55 @@ export default function HistoryGrid({
   );
 
   return (
-    <div className="w-full h-full">
-      <AgGridReact<HistoryData>
-        theme={myTheme}
-        rowData={filteredData}
-        columnDefs={columnDefs}
-        quickFilterText={searchText}
-        defaultColDef={{
-          sortable: true,
-          filter: true,
-          resizable: true,
-          floatingFilter: true,
-        }}
-        rowSelection={{ mode: "multiRow", headerCheckbox: true }}
-        pagination={true}
-        paginationPageSize={20}
-        rowHeight={45}
-        headerHeight={48}
-        animateRows={true}
-      />
+    <div className="w-full h-full flex flex-col p-2 gap-3">
+      <div className="flex justify-between items-center px-2">
+        <h3 className="text-sm font-bold text-slate-600 flex items-center gap-2">
+          <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+          조회 결과 ({filteredData.length}건)
+        </h3>
+        <button
+          onClick={addNewRow}
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md text-sm font-bold transition-all shadow-md active:scale-95"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          신규 이력 추가
+        </button>
+      </div>
+
+      <div className="flex-1 w-full">
+        <AgGridReact<HistoryData>
+          theme={myTheme}
+          rowData={filteredData}
+          columnDefs={columnDefs}
+          quickFilterText={searchText}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            resizable: true,
+            floatingFilter: true,
+            editable: true,
+          }}
+          rowSelection={{ mode: "multiRow", headerCheckbox: true }}
+          pagination={true}
+          paginationPageSize={20}
+          rowHeight={45}
+          headerHeight={48}
+          animateRows={true}
+        />
+      </div>
     </div>
   );
 }

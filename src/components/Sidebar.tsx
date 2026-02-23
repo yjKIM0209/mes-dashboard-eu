@@ -10,7 +10,7 @@ export default function Sidebar() {
     { name: "대시보드", href: "/", icon: "📊" },
     { name: "설비 관리", href: "/equipment", icon: "⚙️" },
     { name: "이력 조회 (AG)", href: "/equipment-history", icon: "📜" },
-    { name: "이력 조회 (Toast)", href: "/history-toast", icon: "🍞" },
+    // { name: "이력 조회 (Toast)", href: "/history-toast", icon: "🍞" },
     { name: "생산 리포트", href: "/reports", icon: "📈" },
   ];
 
