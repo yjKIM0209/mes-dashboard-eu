@@ -1,15 +1,22 @@
 interface DashboardSectionProps {
   title: string;
-  colorClass: string; 
-  lineClass: string;  
+  colorClass: string;
+  lineClass: string;
   children: React.ReactNode;
 }
 
-export default function DashboardSection({ title, colorClass, lineClass, children }: DashboardSectionProps) {
+export default function DashboardSection({
+  title,
+  colorClass,
+  lineClass,
+  children,
+}: DashboardSectionProps) {
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-4">
-        <h2 className={`text-xs font-black uppercase tracking-[0.25em] ${colorClass}`}>
+        <h2
+          className={`text-xs font-black uppercase tracking-[0.25em] ${colorClass}`}
+        >
           {title}
         </h2>
         <div className={`h-[1px] flex-1 ${lineClass}`}></div>
