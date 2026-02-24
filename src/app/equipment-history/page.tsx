@@ -11,17 +11,22 @@ export default function HistoryPage() {
   const [displayEqpIds, setDisplayEqpIds] = useState<string[]>([]);
   const [searchText, setSearchText] = useState("");
 
-  const [periodType, setPeriodType] = useState<PeriodType>("custom");
-  const [startDate, setStartDate] = useState("2026-02-01T00:00");
-  const [endDate, setEndDate] = useState("2026-02-20T23:59");
-
   const formatDate = (date: Date) => {
     const offset = date.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(date.getTime() - offset)
-      .toISOString()
-      .slice(0, 16);
-    return localISOTime;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 16);
   };
+
+  const [periodType, setPeriodType] = useState<PeriodType>("month");
+  const [startDate, setStartDate] = useState(() => {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0);
+    return formatDate(firstDay);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59);
+    return formatDate(lastDay);
+  });
 
   const handlePeriodChange = (type: PeriodType) => {
     setPeriodType(type);
@@ -36,14 +41,19 @@ export default function HistoryPage() {
       end.setHours(23, 59, 59, 999);
     } else if (type === "week") {
       const day = now.getDay();
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      start = new Date(now.setDate(diff));
+      const diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
+      start = new Date(now.getFullYear(), now.getMonth(), diffToMonday);
       start.setHours(0, 0, 0, 0);
-      end = new Date();
+
+      end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
     } else if (type === "month") {
       start = new Date(now.getFullYear(), now.getMonth(), 1);
       start.setHours(0, 0, 0, 0);
-      end = new Date();
+
+      end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
     }
 
     setStartDate(formatDate(start));
@@ -56,7 +66,6 @@ export default function HistoryPage() {
 
   return (
     <div className="flex h-full flex-col p-4 bg-white gap-4 overflow-hidden text-slate-900">
-      {/* 상단 헤더 섹션 */}
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-slate-200">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
@@ -75,9 +84,19 @@ export default function HistoryPage() {
               className="w-72 pl-4 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-md text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
           </div>
-          
+
           <button className="p-2 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors shadow-sm flex items-center justify-center border border-slate-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
@@ -86,7 +105,6 @@ export default function HistoryPage() {
       </div>
 
       <div className="flex flex-1 gap-4 overflow-hidden">
-        {/* 왼쪽 사이드바: 검색 조건 */}
         <section className="w-80 border border-slate-200 bg-slate-50 flex flex-col p-4 rounded-lg shadow-sm gap-4">
           <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2">
             검색 조건
@@ -144,7 +162,6 @@ export default function HistoryPage() {
           </button>
         </section>
 
-        {/* 오른쪽 영역: 그리드 결과 */}
         <section className="flex-1 border border-slate-200 bg-white flex flex-col rounded-lg shadow-sm overflow-hidden">
           <div className="flex-1">
             <HistoryGrid

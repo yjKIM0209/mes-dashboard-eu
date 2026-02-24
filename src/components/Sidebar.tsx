@@ -8,7 +8,7 @@ export default function Sidebar() {
 
   const menus = [
     { name: "대시보드", href: "/", icon: "📊" },
-    { name: "설비 관리", href: "/equipment", icon: "⚙️" },
+    // { name: "설비 관리", href: "/equipment", icon: "⚙️" },
     { name: "이력 조회 (AG)", href: "/equipment-history", icon: "📜" },
     // { name: "이력 조회 (Toast)", href: "/history-toast", icon: "🍞" },
     { name: "생산 리포트", href: "/reports", icon: "📈" },
@@ -17,7 +17,7 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-slate-900 text-white flex flex-col shrink-0">
       <div className="p-6 text-2xl font-black border-b border-slate-800 tracking-tighter text-blue-400">
-        🏭 FACTORY
+        🏭 FACTORY OS
       </div>
 
       <nav className="flex-1 p-4 space-y-1">

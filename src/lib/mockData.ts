@@ -87,7 +87,7 @@ export const mockEquipments: Equipment[] = [
     id: 'MC-008',
     name: '열처리 진공 노 H',
     type: 'Vacuum Furnace',
-    status: 'Running',
+    status: 'Error',
     temperature: 29.1,
     humidity: 12,
     powerUsage: 120.5,
