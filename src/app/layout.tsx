@@ -12,14 +12,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="ko">
       <body className={`${geist.className} flex h-screen bg-slate-50`}>
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+
+        <main className="flex-1 overflow-y-auto relative">
+          {children}
+          {modal}
+        </main>
       </body>
     </html>
   );
