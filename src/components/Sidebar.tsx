@@ -17,7 +17,7 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-slate-900 text-white flex flex-col shrink-0">
       <div className="p-6 text-2xl font-black border-b border-slate-800 tracking-tighter text-blue-400">
-        🏭 FACTORY
+        🏭 FACTORY OS
       </div>
 
       <nav className="flex-1 p-4 space-y-1">

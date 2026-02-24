@@ -1,66 +1,60 @@
-import { mockEquipments } from "../lib/mockData";
-import Link from "next/link";
+import { mockEquipments } from "@/lib/mockData";
+import EquipmentCard from "@/components/EquipmentCard";
+import DashboardSection from "@/components/DashboardSection";
+import OperationRate from "@/components/OperationRate";
 
 export default function Home() {
+  const getGroup = (start: number, end: number) =>
+    mockEquipments.filter((e) => {
+      const idNum = parseInt(e.id.split("-")[1]);
+      return idNum >= start && idNum <= end;
+    });
+
   return (
     <div className="min-h-screen bg-slate-50 p-10">
-      <h1 className="text-3xl font-extrabold text-slate-800 mb-8 border-b-2 border-blue-500 pb-2 inline-block">
-        실시간 설비 모니터링
-      </h1>
+      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-2">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            Factory <span className="text-blue-600">OS</span>
+          </h1>
+          <p className="text-slate-500 mt-1 font-medium text-sm">
+            실시간 통합 설비 관제 시스템
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockEquipments.map((equipment) => (
-          <div
-            key={equipment.id}
-            className="bg-white p-6 rounded-xl shadow-md border border-slate-200 hover:shadow-lg transition-all"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-                  {equipment.type}
-                </p>
-                <h2 className="text-xl font-bold text-slate-900">
-                  {equipment.name}
-                </h2>
-                <p className="text-sm text-slate-400">{equipment.id}</p>
-              </div>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  equipment.status === "Running"
-                    ? "bg-green-100 text-green-700"
-                    : equipment.status === "Error"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-slate-100 text-slate-600"
-                }`}
-              >
-                ● {equipment.status}
-              </span>
-            </div>
+        <OperationRate />
+      </header>
 
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">현재 온도</span>
-                <span
-                  className={`font-semibold ${equipment.temperature > 40 ? "text-red-500" : "text-slate-700"}`}
-                >
-                  {equipment.temperature}°C
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">전력 사용량</span>
-                <span className="font-semibold text-slate-700">
-                  {equipment.powerUsage} kW
-                </span>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto space-y-10">
+        <DashboardSection
+          title="Standard Monitoring (Recharts)"
+          colorClass="text-slate-400"
+          lineClass="bg-slate-200"
+        >
+          {getGroup(1, 3).map((e) => (
+            <EquipmentCard key={e.id} equipment={e} />
+          ))}
+        </DashboardSection>
 
-            <Link href={`/equipment/${equipment.id}`}>
-              <button className="w-full mt-6 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
-                상세 데이터 보기
-              </button>
-            </Link>
-          </div>
-        ))}
+        <DashboardSection
+          title="Real-time Engine (Chart.js)"
+          colorClass="text-blue-500"
+          lineClass="bg-blue-100"
+        >
+          {getGroup(4, 6).map((e) => (
+            <EquipmentCard key={e.id} equipment={e} />
+          ))}
+        </DashboardSection>
+
+        <DashboardSection
+          title="Ultra Performance (LightningChart)"
+          colorClass="text-emerald-500"
+          lineClass="bg-emerald-100"
+        >
+          {getGroup(7, 9).map((e) => (
+            <EquipmentCard key={e.id} equipment={e} />
+          ))}
+        </DashboardSection>
       </div>
     </div>
   );
